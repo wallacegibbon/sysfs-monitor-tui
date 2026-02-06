@@ -219,6 +219,25 @@ Potential agents to implement:
 4. **Network Agent**: Monitor network interfaces via `/sys/class/net`
 5. **Process Agent**: Monitor specific process metrics via `/proc`
 
+## Compact Display Mode
+
+For small terminal panes (height < 10 lines), the monitor automatically switches to a compact view that fits within 3 lines:
+
+**Compact View Format**:
+1. **First line**: Combined temperature and battery status
+   - 🌡 Highest temperature with color coding (green/orange/red)
+   - 🔋 Battery capacity with color coding (green/orange/red) + status + voltage
+   - Separated by " | " if both present
+2. **Second line** (optional): Extra sensor groups summary
+   - Shows count of groups and total sensors
+3. **Third line**: Update timestamp (faint text)
+
+**Color Coding**:
+- **Temperature**: Green (< high threshold), Orange (≥ high), Red (≥ critical)
+- **Battery**: Green (≥ 50%), Orange (20-49%), Red (< 20%)
+
+**Implementation**: `compactView()` method in `monitor.go` with automatic switching based on terminal height (`compactHeightThreshold` constant).
+
 ## Contributing New Agents
 
 1. Create agent implementation in `internal/monitor/`

@@ -9,6 +9,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const compactHeightThreshold = 10
+
 type Monitor struct {
 	temperatureSensors []TemperatureSensor
 	batteryStatus      BatteryStatus
@@ -73,6 +75,11 @@ func (m Monitor) Update(msg tea.Msg) (Monitor, tea.Cmd) {
 func (m Monitor) View() string {
 	if m.width == 0 || m.height == 0 {
 		return "Initializing..."
+	}
+
+	// Use compact view for small panes
+	if m.height < compactHeightThreshold {
+		return m.compactView()
 	}
 
 	var sb strings.Builder
@@ -171,6 +178,75 @@ func (m Monitor) View() string {
 	sb.WriteString(footerStyle.Render(fmt.Sprintf("Last updated: %s | Press 'q' to quit", m.lastUpdate.Format("15:04:05"))))
 
 	return sb.String()
+}
+
+// compactView renders a minimal display suitable for small panes (≤3 lines)
+func (m Monitor) compactView() string {
+	var lines []string
+
+	// Combine temperature and battery on first line if both present
+	var firstLine strings.Builder
+	// Temperature
+	if len(m.temperatureSensors) > 0 {
+		var highest TemperatureSensor
+		for _, sensor := range m.temperatureSensors {
+			if sensor.Value > highest.Value {
+				highest = sensor
+			}
+		}
+		color := "42" // green
+		if highest.Value >= highest.Critical {
+			color = "9" // red
+		} else if highest.Value >= highest.High {
+			color = "214" // orange
+		}
+		style := lipgloss.NewStyle().Foreground(lipgloss.Color(color))
+		fmt.Fprintf(&firstLine, "🌡 %s", style.Render(fmt.Sprintf("%.1f°C", highest.Value)))
+		if len(m.temperatureSensors) > 1 {
+			fmt.Fprintf(&firstLine, " (%d)", len(m.temperatureSensors))
+		}
+	}
+	// Battery
+	bat := m.batteryStatus
+	if bat.Capacity > 0 || bat.Status != "" {
+		if firstLine.Len() > 0 {
+			firstLine.WriteString(" | ")
+		}
+		capacityColor := "42"
+		if bat.Capacity < 20 {
+			capacityColor = "9"
+		} else if bat.Capacity < 50 {
+			capacityColor = "214"
+		}
+		capacityStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(capacityColor))
+		fmt.Fprintf(&firstLine, "🔋 %s %s", capacityStyle.Render(fmt.Sprintf("%d%%", bat.Capacity)), bat.Status)
+		if bat.Voltage > 0 {
+			fmt.Fprintf(&firstLine, " %.2fV", bat.Voltage)
+		}
+	}
+	if firstLine.Len() > 0 {
+		lines = append(lines, firstLine.String())
+	}
+
+	// Extra groups summary (second line)
+	if len(m.extraGroups) > 0 {
+		totalSensors := 0
+		for _, group := range m.extraGroups {
+			totalSensors += len(group.Sensors)
+		}
+		lines = append(lines, fmt.Sprintf("Extra: %d groups, %d sensors", len(m.extraGroups), totalSensors))
+	}
+
+	// Footer with update time (always last line)
+	footerStyle := lipgloss.NewStyle().Faint(true)
+	lines = append(lines, footerStyle.Render(fmt.Sprintf("Updated: %s", m.lastUpdate.Format("15:04:05"))))
+
+	// Ensure we don't exceed 3 lines
+	maxLines := 3
+	if len(lines) > maxLines {
+		lines = lines[:maxLines]
+	}
+	return strings.Join(lines, "\n")
 }
 
 // tickMsg is a message sent periodically to update sensor readings
