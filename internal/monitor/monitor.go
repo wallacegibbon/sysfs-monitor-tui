@@ -188,8 +188,8 @@ func (m Monitor) compactView() string {
 	var firstLine strings.Builder
 	// Temperature
 	if len(m.temperatureSensors) > 0 {
-		var highest TemperatureSensor
-		for _, sensor := range m.temperatureSensors {
+		highest := m.temperatureSensors[0]
+		for _, sensor := range m.temperatureSensors[1:] {
 			if sensor.Value > highest.Value {
 				highest = sensor
 			}
@@ -231,10 +231,30 @@ func (m Monitor) compactView() string {
 	// Extra groups summary (second line)
 	if len(m.extraGroups) > 0 {
 		totalSensors := 0
+		warningCount := 0
+		criticalCount := 0
 		for _, group := range m.extraGroups {
 			totalSensors += len(group.Sensors)
+			for _, sensor := range group.Sensors {
+				if sensor.Critical() {
+					criticalCount++
+				} else if sensor.Warning() {
+					warningCount++
+				}
+			}
 		}
-		lines = append(lines, fmt.Sprintf("Extra: %d groups, %d sensors", len(m.extraGroups), totalSensors))
+		color := "42" // green
+		if criticalCount > 0 {
+			color = "9" // red
+		} else if warningCount > 0 {
+			color = "214" // orange
+		}
+		style := lipgloss.NewStyle().Foreground(lipgloss.Color(color))
+		summary := fmt.Sprintf("Extra: %d groups, %d sensors", len(m.extraGroups), totalSensors)
+		if warningCount > 0 || criticalCount > 0 {
+			summary += fmt.Sprintf(" (%d warning, %d critical)", warningCount, criticalCount)
+		}
+		lines = append(lines, style.Render(summary))
 	}
 
 	// Footer with update time (always last line)

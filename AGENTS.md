@@ -230,13 +230,16 @@ For small terminal panes (height < 10 lines), the monitor automatically switches
    - Separated by " | " if both present
 2. **Second line** (optional): Extra sensor groups summary
    - Shows count of groups and total sensors
+   - Color-coded based on warning/critical status (green/orange/red)
+   - Includes warning/critical counts when present
 3. **Third line**: Update timestamp (faint text)
 
 **Color Coding**:
 - **Temperature**: Green (< high threshold), Orange (≥ high), Red (≥ critical)
 - **Battery**: Green (≥ 50%), Orange (20-49%), Red (< 20%)
+- **Extra Groups**: Green (no warnings/critical), Orange (any warnings), Red (any critical)
 
-**Implementation**: `compactView()` method in `monitor.go` with automatic switching based on terminal height (`compactHeightThreshold` constant).
+**Implementation**: `compactView()` method in `monitor.go` with automatic switching based on terminal height (`compactHeightThreshold` constant). The summary now includes warning/critical counts and color coding for extra groups.
 
 ## Contributing New Agents
 
