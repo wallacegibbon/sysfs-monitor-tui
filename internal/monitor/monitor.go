@@ -200,7 +200,7 @@ func (m Monitor) compactView() string {
 		firstLine.WriteString("🌡 ")
 		for i, sensor := range m.temperatureSensors {
 			if i > 0 {
-				firstLine.WriteString(" ")
+				firstLine.WriteString("   ")
 			}
 			color := "42" // green
 			if sensor.Value >= sensor.Critical {
