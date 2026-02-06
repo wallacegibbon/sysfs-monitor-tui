@@ -72,14 +72,18 @@ func readThermalZone(zonePath string) (TemperatureSensor, error) {
 	highPath := filepath.Join(zonePath, "trip_point_0_temp")
 	if data, err := os.ReadFile(highPath); err == nil {
 		if highMilli, err := strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64); err == nil {
-			sensor.High = float64(highMilli) / 1000.0
+			if highMilli >= 0 {
+				sensor.High = float64(highMilli) / 1000.0
+			}
 		}
 	}
 
 	criticalPath := filepath.Join(zonePath, "trip_point_1_temp")
 	if data, err := os.ReadFile(criticalPath); err == nil {
 		if critMilli, err := strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64); err == nil {
-			sensor.Critical = float64(critMilli) / 1000.0
+			if critMilli >= 0 {
+				sensor.Critical = float64(critMilli) / 1000.0
+			}
 		}
 	}
 
@@ -144,14 +148,18 @@ func readHwmonSensors(hwmonPath string) []TemperatureSensor {
 		// Read critical threshold
 		if critData, err := os.ReadFile(critPath); err == nil {
 			if critMilli, err := strconv.ParseInt(strings.TrimSpace(string(critData)), 10, 64); err == nil {
-				sensor.Critical = float64(critMilli) / 1000.0
+				if critMilli >= 0 {
+					sensor.Critical = float64(critMilli) / 1000.0
+				}
 			}
 		}
 
 		// Read max threshold as high
 		if maxData, err := os.ReadFile(maxPath); err == nil {
 			if maxMilli, err := strconv.ParseInt(strings.TrimSpace(string(maxData)), 10, 64); err == nil {
-				sensor.High = float64(maxMilli) / 1000.0
+				if maxMilli >= 0 {
+					sensor.High = float64(maxMilli) / 1000.0
+				}
 			}
 		}
 

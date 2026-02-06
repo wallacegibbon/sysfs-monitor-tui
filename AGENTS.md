@@ -10,6 +10,7 @@ Flexible agent architecture where each monitoring component implements the `Sens
 - **Purpose**: Monitors CPU/system temperatures via Linux sysfs thermal interfaces
 - **Sysfs Paths**: `/sys/class/thermal/thermal_zone*`, `/sys/class/hwmon/hwmon*`
 - **Data**: Temperature (°C), sensor name, thresholds (high: 80°C, critical: 100°C)
+- **Threshold Validation**: Negative threshold values (e.g., `trip_point_*_temp`, `crit`, `max`) are ignored; default thresholds apply
 - **Implementation**: `ReadTemperatures()` in `sysfs_temperature.go`
 
 ### 2. Battery Monitoring Agent
@@ -102,5 +103,5 @@ Potential agents to implement:
 7. Update this document
 
 ---
-*Last Updated: 2026-02-06*
+*Last Updated: 2026-02-07*
 *System: Linux sysfs monitoring agents*
