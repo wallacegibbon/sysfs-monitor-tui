@@ -33,6 +33,9 @@ func TestCompactView(t *testing.T) {
 	if !strings.Contains(output, "72.5°C") {
 		t.Error("compactView should include highest temperature")
 	}
+	if !strings.Contains(output, "65.0°C") {
+		t.Error("compactView should include all temperatures")
+	}
 	// Ensure battery appears
 	if !strings.Contains(output, "🔋") {
 		t.Error("compactView should include battery icon")

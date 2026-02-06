@@ -92,11 +92,14 @@ func (m Monitor) View() string {
 	sb.WriteString(titleStyle.Render("System Status Monitor"))
 	sb.WriteString("\n\n")
 
-	// Temperatures section
-	sb.WriteString(lipgloss.NewStyle().Bold(true).Render("Temperatures"))
-	sb.WriteString("\n")
+	// Two-column layout: temperatures on left, battery on right
+	var leftCol, rightCol strings.Builder
+	
+	// Temperatures column
+	leftCol.WriteString(lipgloss.NewStyle().Bold(true).Render("Temperatures"))
+	leftCol.WriteString("\n")
 	if len(m.temperatureSensors) == 0 {
-		sb.WriteString("  No temperature sensors found\n")
+		leftCol.WriteString("  No temperature sensors found\n")
 	} else {
 		for _, sensor := range m.temperatureSensors {
 			color := "42" // green
@@ -107,17 +110,16 @@ func (m Monitor) View() string {
 			}
 			style := lipgloss.NewStyle().Foreground(lipgloss.Color(color))
 			tempStr := style.Render(fmt.Sprintf("%6.1f°C", sensor.Value))
-			fmt.Fprintf(&sb, "  %-8s  %s\n", tempStr, sensor.Path)
+			fmt.Fprintf(&leftCol, "  %-8s  %s\n", tempStr, sensor.Path)
 		}
 	}
-	sb.WriteString("\n")
-
-	// Battery section
-	sb.WriteString(lipgloss.NewStyle().Bold(true).Render("Battery"))
-	sb.WriteString("\n")
+	
+	// Battery column
+	rightCol.WriteString(lipgloss.NewStyle().Bold(true).Render("Battery"))
+	rightCol.WriteString("\n")
 	bat := m.batteryStatus
 	if bat.Capacity == 0 && bat.Status == "" {
-		sb.WriteString("  No battery information\n")
+		rightCol.WriteString("  No battery information\n")
 	} else {
 		capacityColor := "42"
 		if bat.Capacity < 20 {
@@ -126,30 +128,37 @@ func (m Monitor) View() string {
 			capacityColor = "214"
 		}
 		capacityStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(capacityColor))
-		fmt.Fprintf(&sb, "  Capacity: %s\n", capacityStyle.Render(fmt.Sprintf("%d%%", bat.Capacity)))
-		fmt.Fprintf(&sb, "  Status: %s\n", bat.Status)
+		fmt.Fprintf(&rightCol, "  Capacity: %s\n", capacityStyle.Render(fmt.Sprintf("%d%%", bat.Capacity)))
+		fmt.Fprintf(&rightCol, "  Status: %s\n", bat.Status)
 		if bat.Voltage > 0 {
-			fmt.Fprintf(&sb, "  Voltage: %.2fV\n", bat.Voltage)
+			fmt.Fprintf(&rightCol, "  Voltage: %.2fV\n", bat.Voltage)
 		}
 		if bat.Current != 0 {
-			fmt.Fprintf(&sb, "  Current: %.2fA\n", bat.Current)
+			fmt.Fprintf(&rightCol, "  Current: %.2fA\n", bat.Current)
 		}
 		if bat.Power > 0 {
-			fmt.Fprintf(&sb, "  Power: %.2fW\n", bat.Power)
+			fmt.Fprintf(&rightCol, "  Power: %.2fW\n", bat.Power)
 		}
 		if bat.Health != "" {
-			fmt.Fprintf(&sb, "  Health: %s\n", bat.Health)
+			fmt.Fprintf(&rightCol, "  Health: %s\n", bat.Health)
 		}
 		if bat.Temperature > 0 {
-			fmt.Fprintf(&sb, "  Temperature: %.1f°C\n", bat.Temperature)
+			fmt.Fprintf(&rightCol, "  Temperature: %.1f°C\n", bat.Temperature)
 		}
 		if bat.Energy > 0 {
-			fmt.Fprintf(&sb, "  Energy: %.2f Wh\n", bat.Energy)
+			fmt.Fprintf(&rightCol, "  Energy: %.2f Wh\n", bat.Energy)
 		}
 		if bat.CapacityLevel != "" {
-			fmt.Fprintf(&sb, "  Capacity Level: %s\n", bat.CapacityLevel)
+			fmt.Fprintf(&rightCol, "  Capacity Level: %s\n", bat.CapacityLevel)
 		}
 	}
+	
+	// Combine columns side by side with spacing
+	leftStr := leftCol.String()
+	rightStr := rightCol.String()
+	combined := lipgloss.JoinHorizontal(lipgloss.Top, leftStr, "    ", rightStr)
+	sb.WriteString(combined)
+	sb.WriteString("\n")
 
 	// Extra sensor groups
 	for _, group := range m.extraGroups {
@@ -186,24 +195,21 @@ func (m Monitor) compactView() string {
 
 	// Combine temperature and battery on first line if both present
 	var firstLine strings.Builder
-	// Temperature
+	// Temperature - show multiple temperatures in a row
 	if len(m.temperatureSensors) > 0 {
-		highest := m.temperatureSensors[0]
-		for _, sensor := range m.temperatureSensors[1:] {
-			if sensor.Value > highest.Value {
-				highest = sensor
+		firstLine.WriteString("🌡 ")
+		for i, sensor := range m.temperatureSensors {
+			if i > 0 {
+				firstLine.WriteString(" ")
 			}
-		}
-		color := "42" // green
-		if highest.Value >= highest.Critical {
-			color = "9" // red
-		} else if highest.Value >= highest.High {
-			color = "214" // orange
-		}
-		style := lipgloss.NewStyle().Foreground(lipgloss.Color(color))
-		fmt.Fprintf(&firstLine, "🌡 %s", style.Render(fmt.Sprintf("%.1f°C", highest.Value)))
-		if len(m.temperatureSensors) > 1 {
-			fmt.Fprintf(&firstLine, " (%d)", len(m.temperatureSensors))
+			color := "42" // green
+			if sensor.Value >= sensor.Critical {
+				color = "9" // red
+			} else if sensor.Value >= sensor.High {
+				color = "214" // orange
+			}
+			style := lipgloss.NewStyle().Foreground(lipgloss.Color(color))
+			firstLine.WriteString(style.Render(fmt.Sprintf("%.1f°C", sensor.Value)))
 		}
 	}
 	// Battery
