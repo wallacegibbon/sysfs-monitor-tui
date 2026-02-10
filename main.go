@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"sysfs-tui-monitor/internal/monitor"
+	"github.com/wallacegibbon/sysfs-tui-monitor/internal/monitor"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

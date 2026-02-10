@@ -31,9 +31,7 @@ Press `q` or `Ctrl+C` to quit.
 ## Installation
 
 ```bash
-git clone <repo-url>
-cd sysfs-tui-monitor
-go install .@latest
+go install github.com/wallacegibbon/sysfs-tui-monitor@latest
 ```
 
 Then run with:
