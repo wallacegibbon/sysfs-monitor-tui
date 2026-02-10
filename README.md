@@ -33,7 +33,12 @@ Press `q` or `Ctrl+C` to quit.
 ```bash
 git clone <repo-url>
 cd sysfs-tui-monitor
-go run main.go
+go install .@latest
+```
+
+Then run with:
+```bash
+sysfs-tui-monitor
 ```
 
 ## Requirements
