@@ -1,4 +1,4 @@
-# sysfs-tui-monitor
+# sysfs-monitor-tui
 
 A terminal-based system monitor for Linux that displays CPU temperatures and battery status using sysfs.
 
@@ -31,12 +31,12 @@ Press `q` or `Ctrl+C` to quit.
 ## Installation
 
 ```bash
-go install github.com/wallacegibbon/sysfs-tui-monitor@latest
+go install github.com/wallacegibbon/sysfs-monitor-tui@latest
 ```
 
 Then run with:
 ```bash
-sysfs-tui-monitor
+sysfs-monitor-tui
 ```
 
 ## Requirements

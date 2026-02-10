@@ -8,7 +8,7 @@ Set Theme "Catppuccin Mocha"
 Set TypingSpeed 200ms
 Set PlaybackSpeed 0.3
 
-Type "sysfs-tui-monitor"
+Type "sysfs-monitor-tui"
 Enter
 Sleep 10
 

@@ -1,4 +1,4 @@
-module github.com/wallacegibbon/sysfs-tui-monitor
+module github.com/wallacegibbon/sysfs-monitor-tui
 
 go 1.25.6
 

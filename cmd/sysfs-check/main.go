@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/wallacegibbon/sysfs-tui-monitor/internal/monitor"
+	"github.com/wallacegibbon/sysfs-monitor-tui/internal/monitor"
 )
 
 func main() {

@@ -5,10 +5,10 @@ Set Width 1024
 Set Height 180
 Set Padding 20
 Set Theme "Catppuccin Mocha"
-Set TypingSpeed 100ms
-Set PlaybackSpeed 0.2
+Set TypingSpeed 200ms
+Set PlaybackSpeed 0.4
 
-Type "sysfs-tui-monitor"
+Type "sysfs-monitor-tui"
 Enter
 Sleep 10
 
