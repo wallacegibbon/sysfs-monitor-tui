@@ -10,12 +10,18 @@ A terminal-based system monitor for Linux that displays CPU temperatures and bat
 - **Compact View**: Automatic 3-line view for small terminal panes
 - **Extensible**: Add custom sensors via the `Sensor` interface
 
+## Installation
+
+```bash
+go install github.com/wallacegibbon/sysfs-monitor-tui@latest
+```
+
 ## Usage
 
 Run the monitor:
 
 ```bash
-go run main.go
+sysfs-monitor-tui
 ```
 
 Press `q` or `Ctrl+C` to quit.
@@ -27,17 +33,6 @@ Press `q` or `Ctrl+C` to quit.
 ### Compact View
 
 ![Compact View](compact-view.gif)
-
-## Installation
-
-```bash
-go install github.com/wallacegibbon/sysfs-monitor-tui@latest
-```
-
-Then run with:
-```bash
-sysfs-monitor-tui
-```
 
 ## Requirements
 
