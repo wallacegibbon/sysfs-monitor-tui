@@ -20,23 +20,23 @@ type Monitor struct {
 }
 
 type TemperatureSensor struct {
-	Name      string
-	Value     float64 // in Celsius
-	High      float64 // high threshold
-	Critical  float64 // critical threshold
-	Path      string  // sysfs path
+	Name     string
+	Value    float64 // in Celsius
+	High     float64 // high threshold
+	Critical float64 // critical threshold
+	Path     string  // sysfs path
 }
 
 type BatteryStatus struct {
-	Capacity      int // percentage
-	Status        string // Charging, Discharging, Full, Unknown
+	Capacity      int     // percentage
+	Status        string  // Charging, Discharging, Full, Unknown
 	Voltage       float64 // volts
 	Current       float64 // amperes
 	Power         float64 // watts
-	Health        string // Health status
+	Health        string  // Health status
 	Temperature   float64 // Celsius
 	Energy        float64 // watt-hours
-	CapacityLevel string // capacity level (Full, Normal, etc.)
+	CapacityLevel string  // capacity level (Full, Normal, etc.)
 }
 
 func NewMonitor() Monitor {
@@ -94,7 +94,7 @@ func (m Monitor) View() string {
 
 	// Two-column layout: temperatures on left, battery on right
 	var leftCol, rightCol strings.Builder
-	
+
 	// Temperatures column
 	leftCol.WriteString(lipgloss.NewStyle().Bold(true).Render("Temperatures"))
 	leftCol.WriteString("\n")
@@ -113,7 +113,7 @@ func (m Monitor) View() string {
 			fmt.Fprintf(&leftCol, "  %-8s  %s\n", tempStr, sensor.Path)
 		}
 	}
-	
+
 	// Battery column
 	rightCol.WriteString(lipgloss.NewStyle().Bold(true).Render("Battery"))
 	rightCol.WriteString("\n")
@@ -152,7 +152,7 @@ func (m Monitor) View() string {
 			fmt.Fprintf(&rightCol, "  Capacity Level: %s\n", bat.CapacityLevel)
 		}
 	}
-	
+
 	// Combine columns side by side with spacing
 	leftStr := leftCol.String()
 	rightStr := rightCol.String()
@@ -297,4 +297,3 @@ func (m Monitor) updateSensors() Monitor {
 	}
 	return m
 }
-
